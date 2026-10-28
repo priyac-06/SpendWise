@@ -1,0 +1,111 @@
+:root {
+    --cream: #fdf8ee;
+    --lavender: #e6dff2;
+    --mint: #cfeedd;
+    --mint-dark: #7fd1a5;
+    --peach: #ffd3c2;
+    --coral: #ff9b7a;
+    --butter: #fff1a8;
+    --charcoal: #2b2b2b;
+    --shadow: 4px 4px 0 var(--charcoal);
+}
+
+body {
+    font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--charcoal);
+    background: var(--cream);
+}
+
+h2, h5 { font-weight: 700; }
+.text-muted { color: #5a5a5a !important; }
+a { color: #4b3f8f; }
+
+/* Cards */
+.card {
+    background: #fff;
+    border: 2px solid var(--charcoal);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+/* Summary cards: colour by position */
+.row-cols-xl-3 > .col:nth-child(1) .card,
+.row-cols-xl-3 > .col:nth-child(6) .card { background: var(--butter); }
+.row-cols-xl-3 > .col:nth-child(2) .card,
+.row-cols-xl-3 > .col:nth-child(3) .card { background: var(--mint); }
+.row-cols-xl-3 > .col:nth-child(4) .card,
+.row-cols-xl-3 > .col:nth-child(5) .card { background: var(--peach); }
+.row-cols-xl-3 .card .text-muted { color: var(--charcoal) !important; opacity: .75; }
+.row-cols-xl-3 .card .fs-3 { font-size: 1.9rem !important; letter-spacing: -0.5px; }
+
+/* Buttons */
+.btn {
+    border: 2px solid var(--charcoal);
+    border-radius: .75rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    box-shadow: 3px 3px 0 var(--charcoal);
+    transition: transform .08s ease, box-shadow .08s ease;
+}
+.btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--charcoal); color: var(--charcoal); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--charcoal); }
+.btn-primary { background: var(--butter); border-color: var(--charcoal); }
+.btn-primary:hover, .btn-primary:focus { background: #ffe97a; border-color: var(--charcoal); }
+.btn-success { background: var(--mint-dark); border-color: var(--charcoal); }
+.btn-success:hover, .btn-success:focus { background: #67c493; border-color: var(--charcoal); }
+.btn-outline-dark, .btn-outline-secondary { background: #fff; }
+.btn-outline-dark:hover, .btn-outline-secondary:hover { background: var(--lavender); }
+.btn-outline-danger { background: #fff; border-color: var(--charcoal); color: #a12626; }
+.btn-outline-danger:hover { background: var(--peach); color: #a12626; border-color: var(--charcoal); }
+
+/* Alerts: pastel with a label and icon already in the text */
+.alert { border: 2px solid var(--charcoal); border-radius: .9rem; color: var(--charcoal); }
+.alert-success { background: var(--mint); }
+.alert-warning { background: var(--butter); }
+.alert-danger { background: var(--peach); }
+.alert-secondary { background: var(--lavender); }
+.alert a { color: var(--charcoal); font-weight: 600; }
+
+/* Progress bars */
+.progress {
+    background: #fff;
+    border: 2px solid var(--charcoal);
+    border-radius: 999px;
+}
+.progress-bar { border-radius: 999px; }
+.progress-bar.bg-success { background-color: var(--mint-dark) !important; }
+.progress-bar.bg-warning { background-color: var(--coral) !important; }
+
+/* Forms */
+.form-control, .form-select {
+    border: 2px solid var(--charcoal);
+    border-radius: .7rem;
+    background: #fff;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--charcoal);
+    box-shadow: 3px 3px 0 var(--butter);
+}
+.form-label { font-weight: 600; }
+
+/* Tables */
+.table { --bs-table-bg: transparent; }
+.table thead th { border-bottom: 2px solid var(--charcoal); font-weight: 700; }
+.table > :not(caption) > * > * { border-bottom-color: rgba(43, 43, 43, .15); }
+.table-hover > tbody > tr:hover > * { background: var(--butter); }
+
+/* Sidebar polish */
+.sidebar { background: var(--lavender); }
+.brand { font-size: 1.4rem; letter-spacing: -0.5px; }
+.side-link { border: 2px solid transparent; font-weight: 500; }
+.side-link.active { box-shadow: 3px 3px 0 var(--charcoal); background: var(--butter); }
+
+/* Small pixel-style accent on the dashboard title */
+.content h2::after {
+    content: "";
+    display: inline-block;
+    width: 10px; height: 10px;
+    margin-left: 10px;
+    background: var(--coral);
+    box-shadow: 10px 0 0 var(--mint-dark), 20px 0 0 var(--butter);
+}

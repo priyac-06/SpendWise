@@ -1,0 +1,161 @@
+﻿@using System.Globalization
+@using System.Text.RegularExpressions
+@model SpendWise.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var inr = new CultureInfo("en-IN");
+    var monthName = new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy");
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    string Nice(object v) => Regex.Replace(v.ToString() ?? "", "(?<=[a-z])(?=[A-Z])", " ");
+    var barWidth = Math.Min(100, Model.SavingsProgressPercent).ToString("0.##", CultureInfo.InvariantCulture);
+}
+
+<div class="mb-4">
+    <h2 class="mb-1">@greeting, Priya 👋</h2>
+    <div class="text-muted">@monthName · Your money, your plan. Let's keep this month on track.</div>
+</div>
+
+@if (!Model.HasPlan)
+{
+    <div class="alert alert-warning">
+        You haven't set a plan for this month yet.
+        <a asp-controller="Plan" asp-action="Index">Set up your Monthly Plan</a> to see your budget and savings goal.
+    </div>
+}
+else
+{
+    @if (Model.BudgetExceeded)
+    {
+        <div class="alert alert-danger">🚨 <strong>Budget exceeded.</strong> You have spent ₹@((-Model.RemainingBudget).ToString("N2", inr)) more than your spendable budget.</div>
+    }
+    else if (Model.BudgetWarning)
+    {
+        <div class="alert alert-warning">⚠️ <strong>Budget warning.</strong> You have used 80% or more of your spendable budget.</div>
+    }
+    @if (Model.OverDailyAllowance)
+    {
+        <div class="alert alert-warning">⚠️ <strong>Over daily allowance.</strong> Today's spending (₹@Model.TodaySpending.ToString("N2", inr)) is above your suggested allowance.</div>
+    }
+    @if (Model.SavingsGoalReached)
+    {
+        <div class="alert alert-success">🎉 <strong>Savings goal reached!</strong> Great work this month.</div>
+    }
+    @if (!Model.BudgetExceeded && !Model.BudgetWarning && !Model.OverDailyAllowance)
+    {
+        <div class="alert alert-success">✅ <strong>On track.</strong> Your spending is within plan.</div>
+    }
+}
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a asp-controller="Expenses" asp-action="Create" class="btn btn-primary">+ Add expense</a>
+    <a asp-controller="Savings" asp-action="Create" class="btn btn-success">+ Record savings</a>
+    <a asp-controller="Plan" asp-action="Index" class="btn btn-outline-dark">Update plan</a>
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3 mb-4">
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Monthly income</div>
+        <div class="fs-3 fw-semibold">₹@Model.MonthlyIncome.ToString("N2", inr)</div>
+    </div></div></div>
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Planned savings</div>
+        <div class="fs-3 fw-semibold">₹@Model.PlannedSavings.ToString("N2", inr)</div>
+    </div></div></div>
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Actual savings</div>
+        <div class="fs-3 fw-semibold">₹@Model.ActualSavings.ToString("N2", inr)</div>
+    </div></div></div>
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Remaining spending budget</div>
+        <div class="fs-3 fw-semibold @(Model.RemainingBudget < 0 ? "text-danger" : "")">₹@Model.RemainingBudget.ToString("N2", inr)</div>
+    </div></div></div>
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Today's spending</div>
+        <div class="fs-3 fw-semibold">₹@Model.TodaySpending.ToString("N2", inr)</div>
+    </div></div></div>
+    <div class="col"><div class="card h-100"><div class="card-body">
+        <div class="text-muted">Suggested daily allowance</div>
+        <div class="fs-3 fw-semibold">₹@Model.SuggestedDailyAllowance.ToString("N2", inr)</div>
+        <div class="small text-muted">@Model.RemainingDays day(s) left</div>
+    </div></div></div>
+</div>
+
+<div class="card mb-4"><div class="card-body">
+    <h5 class="card-title">Savings progress</h5>
+    @if (!Model.HasPlan || Model.PlannedSavings <= 0)
+    {
+        <div class="text-muted">No savings goal set for this month.</div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between mb-1">
+            <span>₹@Model.ActualSavings.ToString("N2", inr) of ₹@Model.PlannedSavings.ToString("N2", inr)</span>
+            <span>@Model.SavingsProgressPercent.ToString("0.##")%</span>
+        </div>
+        <div class="progress" style="height: 24px;">
+            <div class="progress-bar bg-success" style="width: @barWidth%"></div>
+        </div>
+    }
+</div></div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card h-100"><div class="card-body">
+            <h5 class="card-title">Spending by category</h5>
+            @if (!Model.CategoryTotals.Any())
+            {
+                <div class="text-muted">No expenses this month yet.</div>
+            }
+            else
+            {
+                foreach (var c in Model.CategoryTotals)
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>@Nice(c.Category)</span>
+                            <span>₹@c.Total.ToString("N2", inr) · @c.Percent.ToString("0.#")%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" style="width: @c.Percent.ToString("0.#", CultureInfo.InvariantCulture)%"></div>
+                        </div>
+                    </div>
+                }
+            }
+        </div></div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card h-100"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">Recent transactions</h5>
+                <a asp-controller="Expenses" asp-action="Index">View all</a>
+            </div>
+            @if (!Model.RecentExpenses.Any())
+            {
+                <div class="text-muted">No transactions yet. Add your first expense!</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr><th>Title</th><th>Category</th><th>Date</th><th class="text-end">Amount</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model.RecentExpenses)
+                            {
+                                <tr>
+                                    <td>@e.Title</td>
+                                    <td>@Nice(e.Category)</td>
+                                    <td>@e.Date.ToString("dd MMM")</td>
+                                    <td class="text-end">₹@e.Amount.ToString("N2", inr)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div></div>
+    </div>
+</div>
